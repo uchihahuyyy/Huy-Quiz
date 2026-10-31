@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { getSessionState, completeQuiz } from '../services/quizApi';
 import { SessionStateResponse } from '../types/quiz';
-import { formatDuration, getScoreTier, saveLastSessionId, getLastSessionId } from '../utils/helpers';
+import { formatDuration, getScoreTier } from '../utils/helpers';
 import { Loading } from '../components/Loading';
 import { Check, CheckCircle2, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -29,10 +29,6 @@ export const ResultPage: React.FC = () => {
     async function fetchResult() {
       try {
         setIsLoading(true);
-        if (!getLastSessionId()) {
-          saveLastSessionId(sessionId!);
-        }
-
         let state = await getSessionState(sessionId!);
 
         if (state.session.status === 'in_progress') {

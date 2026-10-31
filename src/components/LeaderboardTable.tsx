@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LeaderboardEntry } from '../types/quiz';
-import { formatDuration, formatCompletionDate } from '../utils/helpers';
+import { formatDuration, formatCompletionDate, isMySession } from '../utils/helpers';
 import { Search, ChevronRight } from 'lucide-react';
 
 interface LeaderboardTableProps {
@@ -76,7 +76,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 </tr>
               ) : (
                 filtered.map((entry) => {
-                  const isCurrent = entry.session_id === highlightSessionId;
+                  const isCurrent = isMySession(entry.session_id) || entry.session_id === highlightSessionId;
 
                   return (
                     <tr

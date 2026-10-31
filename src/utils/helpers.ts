@@ -21,8 +21,8 @@ export function getScoreTier(score: number): ScoreTier {
     return {
       title: 'Xuân Huy phiên bản thứ hai',
       description: 'Thôi, bạn biết quá nhiều rồi đấy.',
-      colorClass: 'from-amber-400 to-yellow-500 text-yellow-300',
-      badgeBorder: 'border-yellow-500/50 shadow-yellow-500/20',
+      colorClass: 'text-amber-400',
+      badgeBorder: 'border-amber-500/50',
       emoji: '👑',
     };
   }
@@ -30,8 +30,8 @@ export function getScoreTier(score: number): ScoreTier {
     return {
       title: 'Bạn thân lâu năm',
       description: 'Có vẻ bạn biết kha khá chuyện đấy.',
-      colorClass: 'from-indigo-400 to-purple-500 text-indigo-300',
-      badgeBorder: 'border-indigo-500/50 shadow-indigo-500/20',
+      colorClass: 'text-indigo-400',
+      badgeBorder: 'border-indigo-500/50',
       emoji: '🔥',
     };
   }
@@ -39,16 +39,16 @@ export function getScoreTier(score: number): ScoreTier {
     return {
       title: 'Người quen sơ sơ',
       description: 'Biết Huy nhưng chưa chắc hiểu Huy.',
-      colorClass: 'from-blue-400 to-cyan-500 text-cyan-300',
-      badgeBorder: 'border-cyan-500/50 shadow-cyan-500/20',
+      colorClass: 'text-zinc-300',
+      badgeBorder: 'border-zinc-500/50',
       emoji: '👀',
     };
   }
   return {
     title: 'Người lạ từng lướt qua',
     description: 'Hình như chúng ta chưa từng nói chuyện?',
-    colorClass: 'from-slate-400 to-gray-500 text-slate-300',
-    badgeBorder: 'border-slate-500/50 shadow-slate-500/10',
+    colorClass: 'text-zinc-500',
+    badgeBorder: 'border-zinc-700/50',
     emoji: '🗿',
   };
 }
@@ -99,21 +99,42 @@ export function formatCompletionDate(dateString: string): string {
   }
 }
 
-const LOCAL_STORAGE_LAST_SESSION = 'huy_quiz_last_session_id';
+const LOCAL_STORAGE_MY_SESSIONS = 'huy_quiz_my_sessions';
 
-export function saveLastSessionId(sessionId: string): void {
+/**
+ * Lưu một session do chính trình duyệt này bấm bắt đầu thi
+ */
+export function saveMySession(sessionId: string): void {
   try {
-    localStorage.setItem(LOCAL_STORAGE_LAST_SESSION, sessionId);
+    const raw = localStorage.getItem(LOCAL_STORAGE_MY_SESSIONS);
+    const sessions: string[] = raw ? JSON.parse(raw) : [];
+    if (!sessions.includes(sessionId)) {
+      sessions.push(sessionId);
+      localStorage.setItem(LOCAL_STORAGE_MY_SESSIONS, JSON.stringify(sessions));
+    }
   } catch {
     // Ignore storage errors in private browsing
   }
 }
 
-export function getLastSessionId(): string | null {
+/**
+ * Kiểm tra xem session này có phải do chính trình duyệt này thi không
+ */
+export function isMySession(sessionId: string): boolean {
   try {
-    return localStorage.getItem(LOCAL_STORAGE_LAST_SESSION);
+    const raw = localStorage.getItem(LOCAL_STORAGE_MY_SESSIONS);
+    if (!raw) return false;
+    const sessions: string[] = JSON.parse(raw);
+    return sessions.includes(sessionId);
   } catch {
-    return null;
+    return false;
   }
 }
 
+export function saveLastSessionId(sessionId: string): void {
+  saveMySession(sessionId);
+}
+
+export function getLastSessionId(): string | null {
+  return null;
+}
