@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LeaderboardEntry } from '../types/quiz';
 import { formatDuration, formatCompletionDate } from '../utils/helpers';
-import { Search } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
@@ -16,12 +17,14 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   searchTerm,
   onSearchChange,
 }) => {
+  const navigate = useNavigate();
+
   const filtered = entries.filter((e) =>
     e.username.toLowerCase().includes(searchTerm.toLowerCase().trim())
   );
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-3">
       {/* Search */}
       <div className="relative max-w-xs mx-auto">
         <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -34,6 +37,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
         />
       </div>
 
+      <div className="text-[11px] text-zinc-500 text-center">
+        💡 Bấm vào tên bất kỳ ai để xem chi tiết bài làm của họ
+      </div>
+
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/40">
         <div className="overflow-x-auto">
@@ -44,7 +51,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   #
                 </th>
                 <th scope="col" className="px-4 py-2.5">
-                  Tên
+                  Tên người chơi
                 </th>
                 <th scope="col" className="px-4 py-2.5 text-center">
                   Điểm
@@ -53,14 +60,15 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   Thời gian
                 </th>
                 <th scope="col" className="px-4 py-2.5 text-right hidden sm:table-cell">
-                  Ngày
+                  Ngày thi
                 </th>
+                <th scope="col" className="w-8"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-zinc-500">
+                  <td colSpan={6} className="px-4 py-8 text-center text-zinc-500">
                     {searchTerm
                       ? `Không có kết quả cho "${searchTerm}".`
                       : 'Chưa có lượt thi nào hoàn thành.'}
@@ -73,10 +81,12 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   return (
                     <tr
                       key={entry.session_id}
-                      className={`transition-colors ${
+                      onClick={() => navigate(`/result/${entry.session_id}`)}
+                      title={`Bấm để xem chi tiết bài thi của ${entry.username}`}
+                      className={`transition-colors cursor-pointer group ${
                         isCurrent
-                          ? 'bg-zinc-800 text-white font-medium'
-                          : 'hover:bg-zinc-800/40'
+                          ? 'bg-zinc-800/90 text-white font-medium hover:bg-zinc-700/80'
+                          : 'hover:bg-zinc-800/50'
                       }`}
                     >
                       <td className="px-4 py-2.5 text-center font-mono text-zinc-400">
@@ -85,7 +95,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
                       <td className="px-4 py-2.5 font-medium text-zinc-100">
                         <div className="flex items-center gap-1.5">
-                          <span>{entry.username}</span>
+                          <span className="group-hover:underline">{entry.username}</span>
                           {isCurrent && (
                             <span className="text-[10px] px-1 py-0.2 rounded bg-zinc-700 text-zinc-300">
                               Bạn
@@ -104,6 +114,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
                       <td className="px-4 py-2.5 text-right text-zinc-500 hidden sm:table-cell font-mono">
                         {formatCompletionDate(entry.completed_at)}
+                      </td>
+
+                      <td className="px-2 py-2.5 text-right text-zinc-500 group-hover:text-zinc-300">
+                        <ChevronRight className="w-4 h-4 ml-auto" />
                       </td>
                     </tr>
                   );
