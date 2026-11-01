@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnswerSubmissionResult } from '../types/quiz';
 
 interface AnswerModalProps {
@@ -14,8 +14,25 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
   isLastQuestion,
   onNext,
 }) => {
+  const [canProceed, setCanProceed] = useState(false);
+
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setCanProceed(false);
+      return;
+    }
+
+    setCanProceed(false);
+
+    const timer = setTimeout(() => {
+      setCanProceed(true);
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !canProceed) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
@@ -26,7 +43,7 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onNext]);
+  }, [isOpen, canProceed, onNext]);
 
   if (!isOpen || !result) return null;
 
@@ -75,11 +92,20 @@ export const AnswerModal: React.FC<AnswerModalProps> = ({
         {/* Action Button */}
         <button
           type="button"
-          onClick={onNext}
-          autoFocus
-          className="w-full py-2.5 px-4 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-medium text-sm transition-colors cursor-pointer"
+          onClick={canProceed ? onNext : undefined}
+          disabled={!canProceed}
+          autoFocus={canProceed}
+          className={`w-full py-2.5 px-4 rounded-lg font-medium text-sm transition-all cursor-pointer ${
+            canProceed
+              ? 'bg-zinc-100 hover:bg-white text-zinc-950'
+              : 'bg-zinc-800 text-zinc-500 cursor-not-allowed opacity-60'
+          }`}
         >
-          {isLastQuestion ? 'Xem kết quả' : 'Câu tiếp theo'}
+          {canProceed ? (
+            <span>{isLastQuestion ? 'Xem kết quả' : 'Câu tiếp theo'}</span>
+          ) : (
+            <span className="text-xs">Đang nạp giải thích...</span>
+          )}
         </button>
       </div>
     </div>

@@ -80,6 +80,7 @@ export const LeaderboardPage: React.FC = () => {
           highlightSessionId={lastSessionId}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
+          onRefresh={() => fetchLeaderboard(true)}
         />
       )}
     </div>

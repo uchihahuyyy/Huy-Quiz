@@ -16,7 +16,7 @@ function ensureConfigured(): void {
 }
 
 /**
- * 1. Khởi tạo một phiên chơi mới
+ * 1. Khởi tạo một phiên chơi mới (Đáp án được xáo trộn ngẫu nhiên trên Cloud)
  */
 export async function startQuiz(username: string): Promise<StartQuizResponse> {
   ensureConfigured();
@@ -90,7 +90,7 @@ export async function getSessionState(sessionId: string): Promise<SessionStateRe
 }
 
 /**
- * 5. Lấy danh sách bảng xếp hạng những người điểm cao nhất
+ * 5. Lấy danh sách bảng xếp hạng (đã tự động lọc bỏ các lượt thi thần tốc dưới 12 giây)
  */
 export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
   ensureConfigured();
@@ -106,3 +106,23 @@ export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
   return (data || []) as LeaderboardEntry[];
 }
 
+/**
+ * 6. Xóa nhanh một lượt thi bằng mã PIN Admin ('huyadmin')
+ */
+export async function adminDeleteSession(
+  sessionId: string,
+  adminPin: string
+): Promise<boolean> {
+  ensureConfigured();
+
+  const { data, error } = await supabase.rpc('admin_delete_session', {
+    p_session_id: sessionId,
+    p_admin_pin: adminPin,
+  });
+
+  if (error) {
+    throw new Error(error.message || 'Không thể xóa lượt thi này.');
+  }
+
+  return Boolean(data);
+}

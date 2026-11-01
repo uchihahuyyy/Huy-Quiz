@@ -67,6 +67,9 @@ export function validateUsername(username: string): { isValid: boolean; error?: 
   if (cleanUsername.length > 24) {
     return { isValid: false, error: 'Tên người chơi quá dài (tối đa 24 ký tự).', cleanUsername };
   }
+  if (/^[0-9]+$/.test(cleanUsername)) {
+    return { isValid: false, error: 'Tên người chơi không được chỉ chứa toàn số.', cleanUsername };
+  }
   return { isValid: true, cleanUsername };
 }
 
