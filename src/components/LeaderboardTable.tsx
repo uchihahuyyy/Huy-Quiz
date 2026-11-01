@@ -186,11 +186,6 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           </table>
         </div>
       </div>
-
-      {/* Note about anti-spam speed threshold */}
-      <div className="text-[10px] text-zinc-500 text-center">
-        ⚡ Hệ thống tự động loại bỏ các lượt thi thần tốc dưới 12 giây để chống bot spam.
-      </div>
     </div>
   );
 };

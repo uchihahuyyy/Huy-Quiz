@@ -90,7 +90,7 @@ export async function getSessionState(sessionId: string): Promise<SessionStateRe
 }
 
 /**
- * 5. Lấy danh sách bảng xếp hạng (đã tự động lọc bỏ các lượt thi thần tốc dưới 12 giây)
+ * 5. Lấy danh sách bảng xếp hạng những người điểm cao nhất
  */
 export async function getLeaderboard(limit = 50): Promise<LeaderboardEntry[]> {
   ensureConfigured();

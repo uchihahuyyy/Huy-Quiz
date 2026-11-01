@@ -409,8 +409,6 @@ BEGIN
             completed_at
         FROM quiz_sessions
         WHERE status = 'completed'
-          -- Lọc chặn bot/spam: Người chơi bình thường mất ít nhất 12 giây để đọc và làm 6 câu
-          AND (duration_seconds >= 12 OR duration_seconds IS NULL)
         ORDER BY
             normalized_username,
             score DESC,
@@ -461,6 +459,23 @@ $$;
 
 
 -- 6. HÀM MỚI: admin_delete_session (Xóa người chơi trực tiếp từ web bằng mã PIN)
+CREATE OR REPLACE FUNCTION admin_delete_session(p_session_id TEXT, p_admin_pin TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    IF trim(p_admin_pin) != 'huyadmin' THEN
+        RAISE EXCEPTION 'Mã PIN Admin không chính xác.';
+    END IF;
+
+    DELETE FROM quiz_sessions WHERE id = p_session_id::UUID;
+
+    RETURN true;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION admin_delete_session(p_session_id UUID, p_admin_pin TEXT)
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -478,4 +493,9 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION admin_delete_session(UUID, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION admin_delete_session(TEXT, TEXT) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION admin_delete_session(UUID, TEXT) TO anon, authenticated, service_role;
+
+-- Yêu cầu Supabase nạp lại cache API ngay lập tức
+NOTIFY pgrst, 'reload schema';
+
