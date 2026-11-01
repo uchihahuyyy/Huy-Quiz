@@ -126,3 +126,22 @@ export async function adminDeleteSession(
 
   return Boolean(data);
 }
+
+/**
+ * 7. Xóa hàng loạt nhiều lượt thi cùng lúc
+ */
+export async function adminDeleteMultipleSessions(
+  sessionIds: string[],
+  adminPin: string = 'huyadmin'
+): Promise<void> {
+  ensureConfigured();
+
+  const results = await Promise.allSettled(
+    sessionIds.map((id) => adminDeleteSession(id, adminPin))
+  );
+
+  const failed = results.filter((r) => r.status === 'rejected');
+  if (failed.length > 0 && failed.length === sessionIds.length) {
+    throw new Error('Không thể xóa các lượt thi đã chọn.');
+  }
+}
